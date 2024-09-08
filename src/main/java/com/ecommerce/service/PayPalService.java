@@ -49,14 +49,13 @@ public class PayPalService {
         APIContext apiContext = new APIContext(clientId, clientSecret, mode);
         Payment createdPayment = payment.create(apiContext);
 
-        // Recorremos los enlaces para encontrar el approval_url
         for (Links link : createdPayment.getLinks()) {
             if (link.getRel().equals("approval_url")) {
-                return link.getHref();  // Devuelve la URL de aprobación
+                return link.getHref();  // URL de aprobación
             }
         }
 
-        return null;  // Si no se encuentra la URL
+        return null;
     }
 
     public Payment ejecutarPago(String paymentId, String payerId) throws PayPalRESTException {
@@ -68,3 +67,4 @@ public class PayPalService {
         return payment.execute(apiContext, paymentExecution);
     }
 }
+

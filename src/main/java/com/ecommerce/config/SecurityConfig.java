@@ -23,8 +23,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/usuarios/login", "/usuarios/registro").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/usuarios/login", "/usuarios/registro").permitAll()  // Público para login y registro
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")  // Solo accesible para usuarios con rol ADMIN
+                        .anyRequest().authenticated()  // El resto requiere autenticación
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -43,6 +44,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+
 
 
 

@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,11 @@ public class UsuarioService implements UserDetailsService {
         usuarioRepository.save(usuario);
     }
 
+    // Obtener todos los usuarios
+    public List<Usuario> obtenerTodosLosUsuarios() {
+        return usuarioRepository.findAll();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
@@ -36,4 +42,5 @@ public class UsuarioService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(usuario.get().getEmail(), usuario.get().getContraseña(), new ArrayList<>());
     }
 }
+
 

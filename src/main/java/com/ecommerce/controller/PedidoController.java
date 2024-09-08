@@ -4,7 +4,7 @@ import com.ecommerce.model.Pedido;
 import com.ecommerce.model.DetallePedido;
 import com.ecommerce.model.Usuario;
 import com.ecommerce.service.PedidoService;
-import com.ecommerce.service.EmailService;  // Importa el servicio de correos
+import com.ecommerce.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +19,11 @@ public class PedidoController {
     private PedidoService pedidoService;
 
     @Autowired
-    private EmailService emailService;  // Inyectar el servicio de correos
+    private EmailService emailService;
 
     @PostMapping
-    public Pedido crearPedido(@RequestBody List<DetallePedido> detalles, @RequestParam Double total, @RequestParam Usuario usuario) throws Exception {
-        Pedido nuevoPedido = pedidoService.crearPedido(usuario, detalles, total);
+    public Pedido crearPedido(@RequestBody List<DetallePedido> detalles, @RequestParam Double total, @RequestParam Usuario usuario, @RequestParam(required = false) String codigoCupon) throws Exception {
+        Pedido nuevoPedido = pedidoService.crearPedido(usuario, detalles, total, codigoCupon);
 
         // Enviar confirmación por correo después de la creación del pedido
         emailService.enviarCorreo(usuario.getEmail(), "Confirmación de Pedido", "Tu pedido ha sido recibido y está en proceso.");
@@ -41,12 +41,20 @@ public class PedidoController {
         return pedidoService.obtenerPedidoPorId(id);
     }
 
-    // Endpoint para actualizar el estado de un pedido
+    // Actualizar el estado de un pedido
     @PutMapping("/{idPedido}/estado")
     public ResponseEntity<String> actualizarEstadoPedido(
             @PathVariable Long idPedido,
             @RequestParam String estado) {
         try {
+            // Definir los estados válidos
+            List<String> estadosValidos = List.of("Pagado", "Pendiente", "Cancelado", "Enviado", "Entregado");
+
+            // Verificar si el estado es válido
+            if (!estadosValidos.contains(estado)) {
+                return ResponseEntity.status(400).body("Estado inválido");
+            }
+
             pedidoService.actualizarEstadoPedido(idPedido, estado);
             return ResponseEntity.ok("Estado del pedido actualizado correctamente");
         } catch (Exception e) {
@@ -54,7 +62,7 @@ public class PedidoController {
         }
     }
 
-    // Endpoint para cancelar un pedido
+    // Cancelar un pedido
     @PutMapping("/{idPedido}/cancelar")
     public ResponseEntity<String> cancelarPedido(@PathVariable Long idPedido) {
         try {
@@ -64,8 +72,8 @@ public class PedidoController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
-
 }
+
 
 
 

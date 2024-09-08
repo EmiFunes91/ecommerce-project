@@ -1,8 +1,7 @@
 package com.ecommerce.model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
-
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,13 +12,11 @@ public class Carrito {
     private Long id;
 
     @OneToMany
-    private List<Producto> productos;
+    private List<Producto> productos = new ArrayList<>();
 
-    @ManyToOne
-    private Usuario usuario;
+    private Double total = 0.0;
 
     // Getters y Setters
-
     public Long getId() {
         return id;
     }
@@ -36,11 +33,12 @@ public class Carrito {
         this.productos = productos;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Double getTotal() {
+        return total;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setTotal(Double total) {
+        this.total = total;
     }
 }
+

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -14,6 +15,7 @@ public class CuponService {
     @Autowired
     private CuponRepository cuponRepository;
 
+    // Aplicar cupón
     public Cupon aplicarCupon(String codigo) throws Exception {
         Optional<Cupon> cuponOpt = cuponRepository.findByCodigo(codigo);
 
@@ -30,5 +32,21 @@ public class CuponService {
             throw new Exception("Cupón no válido");
         }
     }
+
+    // Obtener todos los cupones
+    public List<Cupon> obtenerTodosLosCupones() {
+        return cuponRepository.findAll();
+    }
+
+    // Crear un nuevo cupón
+    public Cupon crearCupon(Cupon cupon) {
+        return cuponRepository.save(cupon);
+    }
+
+    // Eliminar un cupón por ID
+    public void eliminarCupon(Long id) {
+        cuponRepository.deleteById(id);
+    }
 }
+
 

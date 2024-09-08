@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
@@ -14,9 +15,19 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    // Umbral de stock bajo (puedes ajustarlo)
+    private static final int UMBRAL_STOCK_BAJO = 5;
+
     // Obtener todos los productos
     public List<Producto> obtenerTodosLosProductos() {
         return productoRepository.findAll();
+    }
+
+    // Obtener productos con stock bajo
+    public List<Producto> obtenerProductosConStockBajo() {
+        return productoRepository.findAll().stream()
+                .filter(producto -> producto.getCantidad() < UMBRAL_STOCK_BAJO)
+                .collect(Collectors.toList());
     }
 
     // Obtener un producto por ID
@@ -34,6 +45,8 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
 }
+
+
 
 
 

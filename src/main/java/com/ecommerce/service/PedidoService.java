@@ -1,8 +1,9 @@
 package com.ecommerce.service;
 
+import com.ecommerce.model.Cupon;
+import com.ecommerce.model.DetallePedido;
 import com.ecommerce.model.Pedido;
 import com.ecommerce.model.Producto;
-import com.ecommerce.model.DetallePedido;
 import com.ecommerce.model.Usuario;
 import com.ecommerce.repository.PedidoRepository;
 import com.ecommerce.repository.ProductoRepository;
@@ -22,15 +23,24 @@ public class PedidoService {
     private ProductoRepository productoRepository;
 
     @Autowired
+    private CuponService cuponService;
+
+    @Autowired
     private EmailService emailService;  // Servicio de correo inyectado
 
-    public Pedido crearPedido(Usuario usuario, List<DetallePedido> detalles, Double total) throws Exception {
+    public Pedido crearPedido(Usuario usuario, List<DetallePedido> detalles, Double total, String codigoCupon) throws Exception {
         // Verificar stock de cada producto
         for (DetallePedido detalle : detalles) {
             Producto producto = detalle.getProducto();
             if (producto.getStock() < detalle.getCantidad()) {
                 throw new Exception("Stock insuficiente para el producto: " + producto.getNombre());
             }
+        }
+
+        // Aplicar el cupón si está disponible
+        if (codigoCupon != null && !codigoCupon.isEmpty()) {
+            Cupon cupon = cuponService.aplicarCupon(codigoCupon);
+            total = total - (total * (cupon.getDescuento() / 100)); // Aplicar descuento en porcentaje
         }
 
         // Reducir el stock de los productos y guardar los cambios
@@ -98,7 +108,7 @@ public class PedidoService {
     public void enviarConfirmacionPedido(String destinatario) {
         emailService.enviarCorreo(destinatario, "Confirmación de Pedido", "Tu pedido ha sido recibido y está en proceso.");
     }
-
 }
+
 
 

@@ -30,6 +30,12 @@ public class ProductoController {
     // Crear un nuevo producto
     @PostMapping
     public Producto guardarProducto(@RequestBody Producto producto) {
+        if (producto.getNombre() == null || producto.getNombre().isEmpty()) {
+            throw new RuntimeException("El nombre del producto no puede estar vacío");
+        }
+        if (producto.getPrecio() == null || producto.getPrecio() <= 0) {
+            throw new RuntimeException("El precio debe ser un valor positivo");
+        }
         return productoService.guardarProducto(producto);
     }
 
@@ -39,8 +45,12 @@ public class ProductoController {
         Optional<Producto> productoExistente = productoService.obtenerProductoPorId(id);
         if (productoExistente.isPresent()) {
             Producto prodActualizado = productoExistente.get();
-            prodActualizado.setNombre(producto.getNombre());
-            prodActualizado.setPrecio(producto.getPrecio());
+            if (producto.getNombre() != null && !producto.getNombre().isEmpty()) {
+                prodActualizado.setNombre(producto.getNombre());
+            }
+            if (producto.getPrecio() != null && producto.getPrecio() > 0) {
+                prodActualizado.setPrecio(producto.getPrecio());
+            }
             prodActualizado.setCantidad(producto.getCantidad());
             return productoService.guardarProducto(prodActualizado);
         } else {
@@ -54,5 +64,6 @@ public class ProductoController {
         productoService.eliminarProducto(id);
     }
 }
+
 
 
